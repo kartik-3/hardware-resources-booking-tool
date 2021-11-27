@@ -20,7 +20,7 @@
     </v-snackbar>
     <v-card>
       <v-card-title>
-        Devices
+        Resources
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -52,7 +52,7 @@
             <v-icon left>
               mdi-plus
             </v-icon>
-               Add New Device
+               Add New Resource
             </v-btn>
           </template>
           <v-card>
@@ -69,7 +69,7 @@
                   >
                     <v-text-field
                       v-model="newItem.deviceName"
-                      label="Device name"
+                      label="Resource name"
                       :rules=deviceNameRules
                     ></v-text-field>
                   </v-col>
@@ -78,7 +78,7 @@
                     md="6"
                   ><v-select
                       v-model="newItem.type"
-                      label="Device Type"
+                      label="Resource Type"
                       :items="deviceTypeList"
                     ></v-select>
                   </v-col>
@@ -124,7 +124,7 @@
         >
           <v-card>
             <v-card-title>
-              <span class="text-h5">Edit Device</span>
+              <span class="text-h5">Edit Resource</span>
             </v-card-title>
 
             <v-card-text>
@@ -136,7 +136,7 @@
                   >
                     <v-text-field
                       v-model="editedItem.deviceName"
-                      label="Device name"
+                      label="Resource name"
                       :rules=deviceNameRules
                     ></v-text-field>
                   </v-col>
@@ -146,7 +146,7 @@
                   >
                     <v-select
                       v-model="editedItem.type"
-                      label="Device Type"
+                      label="Resource Type"
                       :items="deviceTypeList"
                     ></v-select>
                   </v-col>
@@ -319,10 +319,10 @@ import { validateIpv4 } from "./../utils/helpers";
             align: 'start',
             value: 'sno'
           },
-          { text: 'Device Name', value: 'deviceName' },
-          { text: 'Device Type', value: 'type' },
+          { text: 'Resource Name', value: 'deviceName' },
+          { text: 'Resource Type', value: 'type' },
           { text: 'IP address', value: 'ipaddress' },
-          { text: 'Owner', value: 'user' },
+          { text: 'Owner Email ID', value: 'user' },
           { text: 'Team', value: 'team' },
           { text: 'Booking', value: 'booking' },
           { text: 'Till Date', value: 'date' },
@@ -349,7 +349,7 @@ import { validateIpv4 } from "./../utils/helpers";
         ipaddress: '0.0.0.0',
       },
       search:'',
-      formTitle:'New Device',
+      formTitle:'New Resource',
       editDialog: false,
       showBookDevice: false,
       bookDeviceId: null,
@@ -359,16 +359,16 @@ import { validateIpv4 } from "./../utils/helpers";
         v => validateIpv4(v) || 'IP address is invalid'
       ],
       deviceNameRules: [
-        v => !!v || 'Device name is required',
+        v => !!v || 'Resource name is required',
       ],
       deviceTypeRules: [
-        v => !!v || 'Device type is required',
+        v => !!v || 'Resource type is required',
       ],
       teamRules: [
         v => !!v || 'Team is required',
       ],
       ownerRules: [
-        v => !!v || 'Owner is required',
+        v => !!v || 'Owner email ID is required',
       ],
       dates: [(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)],
       deviceTypeList:["Server","VM","Device"],
