@@ -65,8 +65,7 @@
                 <v-row>
                   <v-col
                     cols="6"
-                    sm="6"
-                    md="4"
+                    md="6"
                   >
                     <v-text-field
                       v-model="newItem.deviceName"
@@ -76,37 +75,23 @@
                   </v-col>
                   <v-col
                     cols="6"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
+                    md="6"
+                  ><v-select
                       v-model="newItem.type"
                       label="Device Type"
-                      :rules=deviceTypeRules
-                    ></v-text-field>
+                      :items="deviceTypeList"
+                    ></v-select>
                   </v-col>
                 </v-row>
                 <v-row>
                   <v-col
-                    cols="6"
-                    sm="6"
-                    md="4"
+                    cols="12"
+                    md="12"
                   >
                     <v-text-field
                       v-model="newItem.ipaddress"
                       label="IP Address"
                       :rules=ipRules
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="6"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="newItem.team"
-                      label="Team"
-                      :rules=teamRules
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -147,8 +132,7 @@
                 <v-row>
                   <v-col
                     cols="12"
-                    sm="6"
-                    md="4"
+                    md="6"
                   >
                     <v-text-field
                       v-model="editedItem.deviceName"
@@ -158,19 +142,17 @@
                   </v-col>
                   <v-col
                     cols="12"
-                    sm="6"
-                    md="4"
+                    md="6"
                   >
-                    <v-text-field
+                    <v-select
                       v-model="editedItem.type"
                       label="Device Type"
-                      :rules=deviceTypeRules
-                    ></v-text-field>
+                      :items="deviceTypeList"
+                    ></v-select>
                   </v-col>
                   <v-col
                     cols="12"
-                    sm="6"
-                    md="4"
+                    md="6"
                   >
                     <v-text-field
                       v-model="editedItem.ipaddress"
@@ -180,14 +162,13 @@
                   </v-col>
                   <v-col
                     cols="12"
-                    sm="6"
-                    md="4"
+                    md="6"
                   >
-                    <v-text-field
+                    <v-select
                       v-model="editedItem.team"
                       label="Team"
-                      :rules=teamRules
-                    ></v-text-field>
+                      :items="teamsList"
+                    ></v-select>
                   </v-col>
                 </v-row>
               </v-container>
@@ -257,17 +238,23 @@
                       prepend-icon="mdi-calendar"
                       readonly
                     ></v-text-field>
+                    <v-select
+                      v-model="bookDeviceObject.team"
+                      label="Team"
+                      :items="teamsList"
+                    ></v-select>
+                    <v-row>
+                      <v-col cols="6">
+                        <v-btn block text color="blue darken-1" @click="cancelBooking">Cancel</v-btn>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-btn block text color="blue darken-1" @click="book">Book</v-btn>
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </v-row>
                 </v-container>
                 </v-card-text>
-              <v-divider></v-divider>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="blue darken-1" @click="cancelBooking">Cancel</v-btn>
-                <v-btn text color="blue darken-1" @click="book">Book</v-btn>
-                <v-spacer></v-spacer>
-              </v-card-actions>
             </v-card>
           </v-dialog>
         </template>
@@ -301,9 +288,17 @@
             v-if="item.availability==true"
             @click="bookDeviceForm(item)"
           >
-            Book
+            Book Now
           </v-btn>
           <span class="red--text text-center" v-else>ALREADY BOOKED</span>
+        </template>
+        <template v-slot:item.date="{ item }">
+          <span
+            v-if="item.availability==true"
+          >
+            -
+          </span>
+          <span  v-else>{{item.date}}</span>
         </template>
       </v-data-table>
     </v-card>
@@ -330,6 +325,7 @@ import { validateIpv4 } from "./../utils/helpers";
           { text: 'Owner', value: 'user' },
           { text: 'Team', value: 'team' },
           { text: 'Booking', value: 'booking' },
+          { text: 'Till Date', value: 'date' },
         ],
       alert:false,
       deleteObj:null,
@@ -345,21 +341,19 @@ import { validateIpv4 } from "./../utils/helpers";
         deviceName: '',
         type: '',
         ipaddress: '0.0.0.0',
-        team:''
       },
       newEditedItem: {},
       defaultItem: {
         deviceName: '',
         type: '',
         ipaddress: '0.0.0.0',
-        team:''
       },
       search:'',
       formTitle:'New Device',
       editDialog: false,
       showBookDevice: false,
       bookDeviceId: null,
-      // dates: ['2021-11-26', '2021-11-27'],
+      bookDeviceObject: {},
       ipRules: [
         v => !!v || 'IP address is required',
         v => validateIpv4(v) || 'IP address is invalid'
@@ -377,6 +371,8 @@ import { validateIpv4 } from "./../utils/helpers";
         v => !!v || 'Owner is required',
       ],
       dates: [(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)],
+      deviceTypeList:["Server","VM","Device"],
+      teamsList:["HiOS","HiSecOS","HiLCOS","Provize","Wireless","Grtcomm", "No team"]
     }),
     created () {
       if(this.userRole=="admin"){this.headers.push({ text: 'Actions', value: 'actions' })}
@@ -395,8 +391,6 @@ import { validateIpv4 } from "./../utils/helpers";
           this.newItem.type === "" ||
           this.newItem.ipaddress === null ||
           this.newItem.ipaddress === "" ||
-          this.newItem.team === null ||
-          this.newItem.team === "" ||
           !validateIpv4(this.newItem.ipaddress)
         ) {
           return true;
@@ -430,11 +424,13 @@ import { validateIpv4 } from "./../utils/helpers";
       },
       editItem (item){
         this.editDialog = true
-        this.newEditedItem = this.editedItem;
-        this.newEditedItem.id = item.id;
+        this.editedItem = Object.assign({}, item)
+        this.newEditedItem = item
       },
       saveEdit(){
-        updateDevice(this.newEditedItem)
+        updateDevice(this.editedItem)
+        const index = this.devices.indexOf(this.newEditedItem)
+        Object.assign(this.devices[index], this.editedItem)
         this.editDialog = false
       },
       closeEdit(){
@@ -468,20 +464,21 @@ import { validateIpv4 } from "./../utils/helpers";
         this.newDeviceDialog =false
       },
       bookDeviceForm(item){
-        this.bookDevice = item
+        this.bookDeviceObject = item
         this.showBookDevice = true
       },
       async book(){
         await bookDevice({
-          deviceId: this.bookDevice.id,
+          deviceId: this.bookDeviceObject.id,
           emailId: this.$store.state.user.emailId,
-          dates: this.dates
+          dates: this.dates,
+          team: this.bookDeviceObject.team
         }).then(async (res) => {
           await this.sendEmailExistingOwner(res.data, this.$store.state.user.emailId);
           await this.sendEmailNewOwner(res.data, this.$store.state.user.emailId);
         })
         this.initialize()
-        const updatedDevice = await getDeviceFromID(this.bookDevice.id)
+        const updatedDevice = await getDeviceFromID(this.bookDeviceObject.id)
         this.devices.forEach((device)=>{
           if(device.id == updatedDevice.id){
             device=updatedDevice

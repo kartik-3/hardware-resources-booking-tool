@@ -54,12 +54,10 @@ async function main() {
 
     //get device of one user
     devicesRouter.post("/email", async(req, res) => {
-      console.log(req.body.email)
       await client
       .db("device-booking")
       .collection("devices")
         .find({user: req.body.email}).toArray( async (err, response) => {
-          console.log(response)
         if (response==null) {
           res.status(404).send({ msg: "No device available" });
         } else {
@@ -76,8 +74,6 @@ async function main() {
           res.status(400).send({ msg: "Device Type not present in request" });
         } else if (!req.body.ipaddress) {
             res.status(400).send({ msg: "IP address not present in request" });
-        } else if (!req.body.team) {
-          res.status(400).send({ msg: "Team not present in request" });
         } else {
           const data = {
             id: 0,
@@ -86,7 +82,8 @@ async function main() {
             user: defaultUser,
             ipaddress: req.body.ipaddress,
             availability: true,
-            team: req.body.team,
+            team: "No team",
+            date: new Date().toISOString().substr(0, 10),
           };
           data.id = generateUuid();
         await client

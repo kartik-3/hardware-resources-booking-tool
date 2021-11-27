@@ -2,7 +2,7 @@
   <v-app>
     <v-card :loading="loading" class="mx-auto my-auto" width="500">
       <v-card-title center class="pl-6">
-          Sign In
+          <v-img src="@/assets/MainLogo.jpg"/>
       </v-card-title>
       <v-form>
         <v-container>
@@ -11,6 +11,8 @@
               <v-text-field
                 v-model="email"
                 label="E-mail"
+                placeholder=" "
+                persistent-placeholder
                 :rules="emailRules"
                 required
               ></v-text-field>
@@ -94,7 +96,7 @@ export default {
       ],
       emailRules: [
         v => !!v || 'E-mail is required',
-        v => validateEmail(v) || 'E-mail must be valid',
+        v => validateEmail(v) || 'Use a valid incedoinc email ID',
       ],
     };
   },
